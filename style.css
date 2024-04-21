@@ -229,7 +229,7 @@ button {
             padding: 2.5px 5px;
             font-size: 12px;
             text-align: center;
-            
+            overflow-wrap: break-word;
         }
 
         .avatar {
