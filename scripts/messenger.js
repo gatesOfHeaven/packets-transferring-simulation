@@ -80,6 +80,10 @@ const openChat = () => {
     dynamicIsland.style.width = '130px';
     dynamicIsland.append(senderInDynamicIsland, receiverInDynamicIsland);
 
+    currPath = currPath.toString();
+    while (currPath.includes(','))
+        currPath = currPath.replace(',', ' ');
+
     chat.header.querySelector('.path').textContent = currPath;
     chat.header.querySelector('.avatar').textContent = receiverId;
     chat.footer.querySelector('.avatar').textContent = senderId;
