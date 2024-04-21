@@ -89,7 +89,7 @@ const openChat = () => {
     chat.footer.querySelector('.avatar').textContent = senderId;
     
     messages.filter(message =>
-        senderId == message.senderId || senderId == message.receiverId
+        senderId == message.senderId && senderId == message.receiverId
     ).forEach(message => {
         let month = message.time.getMonth();
         let hours = message.time.getHours();
