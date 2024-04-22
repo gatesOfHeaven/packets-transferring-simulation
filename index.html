@@ -9,11 +9,11 @@
 </head>
 <body>
     <main id="build-bar">
-        <input id="vertices-count" placeholder="Vertices Count" type="number" min="2">
+        <input class="creatingGraphInput" id="vertices-count" placeholder="Vertices Count" type="number" min="2">
         <button onclick="addVertices()">Create</button>
         <div style="display: flex; gap: 10px;">
-            <input id="source-input" placeholder="source" type="number" min="0">
-            <input id="target-input" placeholder="target" type="number" min="0">
+            <input id="source-input" class="creatingGraphInput" placeholder="source" type="number" min="0">
+            <input id="target-input" class="creatingGraphInput" placeholder="target" type="number" min="0">
         </div>
         <button onclick="connect()">Connect</button>
         <button onclick="submit()" style="color: white; background-color: #374151;">
@@ -46,7 +46,11 @@
         <div id="history"></div>
         <footer>
             <div class="avatar"></div>
-            <input type="text" placeholder="Type a message">
+            <input type="text" id="messageInput" placeholder="Enter your message">
+            <label style="width: 20px;" for="fileInput" class="file-input-label">
+                <img width="25" height="25" src="https://img.icons8.com/color/48/attach.png" alt="attach"/>
+                <input type="file" id="fileInput" accept="image/*">
+            </label>
             <button onclick="sendMessage()">Send</button>
         </footer>
     </main>
@@ -56,5 +60,5 @@
 <script src="scripts/MinHeap.js"></script>
 <script src="scripts/manager.js"></script>
 <script src="scripts/messenger.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.4/pako.min.js"></script>
 </html>

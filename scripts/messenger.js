@@ -141,11 +141,14 @@ const closeChat = () => {
     chat.history.innerHTML = '';
 };
 
+const QUALITY = 0.7;
+const history = document.getElementById("history");
+const fileInput = document.getElementById("fileInput");
 
 const sendMessage = () => {
-    const messageInput = chat.footer.querySelector('input');
-    if (messageInput.value == '') {
-        showAlert('💨', 'Error!', 'Your message is empty');
+    const messageInput = document.getElementById("messageInput");
+    if (messageInput.value === "") {
+        showAlert("💨", "Error!", "Your message is empty");
         return;
     }
 
@@ -155,31 +158,111 @@ const sendMessage = () => {
         receiverId: currPath[currPath.length - 1],
         path: currPath.slice(),
         text: messageInput.value,
-        time: new Date()
+        time: new Date(),
+        image: null // Placeholder for the compressed image data
     };
 
     let month = message.time.getMonth();
     let hours = message.time.getHours();
     let minutes = message.time.getMinutes();
-    month = (month < 9 ? '0' : '') + (month + 1);
-    hours = (hours < 10 ? '0' : '') + hours;
-    minutes = (minutes < 10 ? '0' : '') + minutes;
+    month = (month < 9 ? "0" : "") + (month + 1);
+    hours = (hours < 10 ? "0" : "") + hours;
+    minutes = (minutes < 10 ? "0" : "") + minutes;
 
-    messageInput.value = '';
-    const messageTextBody = document.createElement('div');
-    messageTextBody.className = 'dialog-shape';
+    messageInput.value = "";
+    const messageTextBody = document.createElement("div");
+    messageTextBody.className = "dialog-shape";
     messageTextBody.textContent = message.text;
-    const messageTimeBody = document.createElement('span');
-    messageTimeBody.className = 'time';
+    const messageTimeBody = document.createElement("span");
+    messageTimeBody.className = "time";
     messageTimeBody.textContent = `${message.time.getDate()}.${month} ${hours}:${minutes}`;
-    const messageBody = document.createElement('div');
-    messageBody.className = 'sender-message';
+    const messageBody = document.createElement("div");
+    messageBody.className = "sender-message";
     messageBody.append(messageTimeBody, messageTextBody);
-    chat.history.appendChild(messageBody);
-    chat.history.scrollTop = chat.history.scrollHeight - chat.history.clientHeight;
+    history.appendChild(messageBody);
+    history.scrollTop = history.scrollHeight - history.clientHeight;
 
     messages[message.id] = message;
 };
+
+fileInput.addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    compressAndSendMessage(file);
+});
+
+const compressAndSendMessage = (file) => {
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const imageData = e.target.result; // Binary data of the image
+
+            // Log the original image size
+            console.log("Original Image Size:", imageData.length, "bytes");
+
+            // Compress the image using canvas
+            const img = new Image();
+            img.src = imageData;
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0, img.width, img.height);
+
+                canvas.toBlob(
+                    (blob) => {
+                        // Log the compressed image size
+                        console.log("Compressed Image Size:", blob.size, "bytes");
+                        const compressedImageDataURL = URL.createObjectURL(blob);
+                        sendMessageWithImage(compressedImageDataURL);
+                    },
+                    file.type
+                );
+            };
+        };
+        reader.readAsDataURL(file); // Read the selected file as data URL
+    }
+};
+
+const sendMessageWithImage = (imageDataURL) => {
+    const message = {
+        id: messages.length,
+        senderId: currPath[0],
+        receiverId: currPath[currPath.length - 1],
+        path: currPath.slice(),
+        text: "",
+        time: new Date(),
+        image: imageDataURL
+    };
+
+    let month = message.time.getMonth();
+    let hours = message.time.getHours();
+    let minutes = message.time.getMinutes();
+    month = (month < 9 ? "0" : "") + (month + 1);
+    hours = (hours < 10 ? "0" : "") + hours;
+    minutes = (minutes < 10 ? "0" : "") + minutes;
+
+    const messageImage = document.createElement("img");
+    messageImage.classList.add('message-img')
+    messageImage.src = imageDataURL;
+
+    const messageTimeBody = document.createElement("span");
+    messageTimeBody.className = "time";
+    messageTimeBody.textContent = `${message.time.getDate()}.${month} ${hours}:${minutes}`;
+
+    const messageBody = document.createElement("div");
+    messageBody.className = "image-container";
+    messageBody.className = "sender-message";
+    messageBody.appendChild(messageTimeBody);
+    messageBody.appendChild(messageImage);
+
+    history.appendChild(messageBody);
+    history.scrollTop = history.scrollHeight - history.clientHeight;
+
+    messages[message.id] = message;
+};
+
+
 
 
 const showContext = (event) => {
