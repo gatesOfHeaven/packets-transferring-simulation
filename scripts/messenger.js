@@ -145,8 +145,15 @@ const QUALITY = 0.7;
 const history = document.getElementById("history");
 const fileInput = document.getElementById("fileInput");
 
+const messageInput = document.getElementById("messageInput");
+
+messageInput.addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        sendMessage();
+    }
+});
+
 const sendMessage = () => {
-    const messageInput = document.getElementById("messageInput");
     if (messageInput.value === "") {
         showAlert("💨", "Error!", "Your message is empty");
         return;
@@ -194,12 +201,8 @@ const compressAndSendMessage = (file) => {
     if (file) {
         const reader = new FileReader();
         reader.onload = (e) => {
-            const imageData = e.target.result; // Binary data of the image
-
-            // Log the original image size
+            const imageData = e.target.result; 
             console.log("Original Image Size:", imageData.length, "bytes");
-
-            // Compress the image using canvas
             const img = new Image();
             img.src = imageData;
             img.onload = () => {
@@ -211,7 +214,6 @@ const compressAndSendMessage = (file) => {
 
                 canvas.toBlob(
                     (blob) => {
-                        // Log the compressed image size
                         console.log("Compressed Image Size:", blob.size, "bytes");
                         const compressedImageDataURL = URL.createObjectURL(blob);
                         sendMessageWithImage(compressedImageDataURL);
@@ -220,7 +222,7 @@ const compressAndSendMessage = (file) => {
                 );
             };
         };
-        reader.readAsDataURL(file); // Read the selected file as data URL
+        reader.readAsDataURL(file);
     }
 };
 
@@ -260,6 +262,22 @@ const sendMessageWithImage = (imageDataURL) => {
     history.scrollTop = history.scrollHeight - history.clientHeight;
 
     messages[message.id] = message;
+
+    
+    messageImage.addEventListener('click', (event) => {
+        const modal = document.createElement('div');
+        modal.classList.add('modal');
+        
+        const modalImage = document.createElement('img');
+        modalImage.src = imageDataURL;
+        modalImage.classList.add('modal-image');
+        modal.appendChild(modalImage);
+        document.body.appendChild(modal);
+        modal.addEventListener('click', () => {
+            modal.remove();
+        });
+        event.stopPropagation();
+    });
 };
 
 
