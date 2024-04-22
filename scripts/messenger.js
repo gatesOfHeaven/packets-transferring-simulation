@@ -14,9 +14,10 @@ const phoneMenu = document.querySelector('#manage-bar aside');
 const dynamicIsland = document.getElementById('dynamic-island');
 const senderInput = document.getElementById('sender');
 const receiverInput = document.getElementById('receiver');
+const fileInput = document.getElementById('file-input');
 const chat = {
     header: document.querySelector('#manage-bar header'),
-    history: document.querySelector('#history'),
+    history: document.getElementById('history'),
     footer: document.querySelector('#manage-bar footer')
 };
 
@@ -92,6 +93,17 @@ const openChat = () => {
         senderId == message.senderId && receiverId == message.receiverId ||
         senderId == message.receiverId && receiverId == message.senderId
     ).forEach(message => {
+        let messageContentBody;
+        if (message.image) {
+            messageContentBody = document.createElement('img');
+            messageContentBody.className = 'message-img';
+            messageContentBody.src = message.image;
+        } else {
+            messageContentBody = document.createElement('div');
+            messageContentBody.className = 'dialog-shape';
+            messageContentBody.textContent = message.text;
+        }
+
         let month = message.time.getMonth();
         let hours = message.time.getHours();
         let minutes = message.time.getMinutes();
@@ -99,22 +111,18 @@ const openChat = () => {
         hours = (hours < 10 ? '0' : '') + hours;
         minutes = (minutes < 10 ? '0' : '') + minutes;
 
-        const messageTextBody = document.createElement('div');
-        messageTextBody.className = 'dialog-shape';
-        messageTextBody.textContent = message.text;
         const messageTimeBody = document.createElement('span');
         messageTimeBody.className = 'time';
         messageTimeBody.textContent = `${message.time.getDate()}.${month} ${hours}:${minutes}`;
+        
         const messageBody = document.createElement('div');
-
         if (senderId == message.senderId) {
-            messageBody.append(messageTimeBody, messageTextBody);
+            messageBody.append(messageTimeBody, messageContentBody);
             messageBody.className = 'sender-message';
         } else {
-            messageBody.append(messageTextBody, messageTimeBody);
+            messageBody.append(messageContentBody, messageTimeBody);
             messageBody.className = 'receiver-message';
         }
-
         chat.history.appendChild(messageBody);
     });
 
@@ -141,12 +149,8 @@ const closeChat = () => {
     chat.history.innerHTML = '';
 };
 
-const QUALITY = 0.7;
-const history = document.getElementById("history");
-const fileInput = document.getElementById("fileInput");
-
 const sendMessage = () => {
-    const messageInput = document.getElementById("messageInput");
+    const messageInput = document.getElementById("message-input");
     if (messageInput.value === "") {
         showAlert("💨", "Error!", "Your message is empty");
         return;
@@ -159,7 +163,7 @@ const sendMessage = () => {
         path: currPath.slice(),
         text: messageInput.value,
         time: new Date(),
-        image: null // Placeholder for the compressed image data
+        image: null
     };
 
     let month = message.time.getMonth();
@@ -179,8 +183,8 @@ const sendMessage = () => {
     const messageBody = document.createElement("div");
     messageBody.className = "sender-message";
     messageBody.append(messageTimeBody, messageTextBody);
-    history.appendChild(messageBody);
-    history.scrollTop = history.scrollHeight - history.clientHeight;
+    chat.history.appendChild(messageBody);
+    chat.history.scrollTop = chat.history.scrollHeight - chat.history.clientHeight;
 
     messages[message.id] = message;
 };
@@ -193,10 +197,8 @@ fileInput.addEventListener("change", (event) => {
 const compressAndSendMessage = (file) => {
     if (file) {
         const reader = new FileReader();
-        reader.onload = (e) => {
-            const imageData = e.target.result; // Binary data of the image
-
-            // Log the original image size
+        reader.onload = event => {
+            const imageData = event.target.result; // Binary data of the image
             console.log("Original Image Size:", imageData.length, "bytes");
 
             // Compress the image using canvas
@@ -209,15 +211,11 @@ const compressAndSendMessage = (file) => {
                 canvas.height = img.height;
                 ctx.drawImage(img, 0, 0, img.width, img.height);
 
-                canvas.toBlob(
-                    (blob) => {
-                        // Log the compressed image size
-                        console.log("Compressed Image Size:", blob.size, "bytes");
-                        const compressedImageDataURL = URL.createObjectURL(blob);
-                        sendMessageWithImage(compressedImageDataURL);
-                    },
-                    file.type
-                );
+                canvas.toBlob(blob => {
+                    console.log("Compressed Image Size:", blob.size, "bytes");
+                    const compressedImageDataURL = URL.createObjectURL(blob);
+                    sendMessageWithImage(compressedImageDataURL);
+                }, file.type);
             };
         };
         reader.readAsDataURL(file); // Read the selected file as data URL
@@ -242,22 +240,20 @@ const sendMessageWithImage = (imageDataURL) => {
     hours = (hours < 10 ? "0" : "") + hours;
     minutes = (minutes < 10 ? "0" : "") + minutes;
 
-    const messageImage = document.createElement("img");
-    messageImage.classList.add('message-img')
-    messageImage.src = imageDataURL;
-
     const messageTimeBody = document.createElement("span");
     messageTimeBody.className = "time";
     messageTimeBody.textContent = `${message.time.getDate()}.${month} ${hours}:${minutes}`;
 
-    const messageBody = document.createElement("div");
-    messageBody.className = "image-container";
-    messageBody.className = "sender-message";
-    messageBody.appendChild(messageTimeBody);
-    messageBody.appendChild(messageImage);
+    const messageImage = document.createElement("img");
+    messageImage.classList.add('message-img')
+    messageImage.src = imageDataURL;
 
-    history.appendChild(messageBody);
-    history.scrollTop = history.scrollHeight - history.clientHeight;
+    const messageBody = document.createElement("div");
+    messageBody.className = "sender-message";
+    messageBody.append(messageTimeBody, messageImage);
+
+    chat.history.appendChild(messageBody);
+    chat.history.scrollTop = chat.history.scrollHeight - chat.history.clientHeight;
 
     messages[message.id] = message;
 };
@@ -302,7 +298,7 @@ const showContext = (event) => {
     document.body.appendChild(context.body);
 
     for (let part in chat)
-        chat[part].style.filter = 'blur(1px)';
+        chat[part].style.filter = 'blur(2.5px)';
 
     const hideContest = () => {
         context.body.remove();

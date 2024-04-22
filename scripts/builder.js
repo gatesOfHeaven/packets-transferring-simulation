@@ -70,13 +70,14 @@ const addVertices = () => {
 
     vertices = [];
     edges = [];
+    const areaWidth = area.getBoundingClientRect().width;
 
     for (let i = 0; i < n; i++) {
         const vertexBody = document.createElement('div');
         vertexBody.id = `vertex-${i}`;
         vertexBody.className = 'vertex';
-        vertexBody.style.left = `${10 + 40 * (i % 12)}px`;
-        vertexBody.style.top = `${10 + 40 * parseInt(i/12)}px`;
+        vertexBody.style.left = `${10 + 40 * (i % (areaWidth / 45))}px`;
+        vertexBody.style.top = `${10 + 40 * parseInt(i * 45 / areaWidth)}px`;
         vertexBody.textContent = i;
         area.appendChild(vertexBody);
 
@@ -99,8 +100,11 @@ const connect = () => {
     }
 
     if (
+        sourceId == targetId ||
         sourceId < 0 || sourceId >= n ||
-        targetId < 0 || targetId >= n
+        targetId < 0 || targetId >= n ||
+        sourceId[0] == '0' && sourceId != 0 ||
+        targetId[0] == '0' && targetId != 0
     ) {
         showAlert('👩🏼‍🦽', 'Error!', 'Invalid input');
         return;

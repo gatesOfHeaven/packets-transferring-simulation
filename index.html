@@ -9,11 +9,11 @@
 </head>
 <body>
     <main id="build-bar">
-        <input class="creatingGraphInput" id="vertices-count" placeholder="Vertices Count" type="number" min="2">
+        <input id="vertices-count" placeholder="Vertices Count" type="number" min="2">
         <button onclick="addVertices()">Create</button>
         <div style="display: flex; gap: 10px;">
-            <input id="source-input" class="creatingGraphInput" placeholder="source" type="number" min="0">
-            <input id="target-input" class="creatingGraphInput" placeholder="target" type="number" min="0">
+            <input id="source-input" placeholder="source" type="number" min="0">
+            <input id="target-input" placeholder="target" type="number" min="0">
         </div>
         <button onclick="connect()">Connect</button>
         <button onclick="submit()" style="color: white; background-color: #374151;">
@@ -46,10 +46,10 @@
         <div id="history"></div>
         <footer>
             <div class="avatar"></div>
-            <input type="text" id="messageInput" placeholder="Enter your message">
-            <label style="width: 20px;" for="fileInput" class="file-input-label">
-                <img width="25" height="25" src="https://img.icons8.com/color/48/attach.png" alt="attach"/>
-                <input type="file" id="fileInput" accept="image/*">
+            <input type="text" id="message-input" placeholder="Enter your message">
+            <label for="file-input" class="file-input-label">
+                <input type="file" id="file-input" accept="image/*">
+                <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M7.9175 17.8068L15.8084 10.2535C16.7558 9.34668 16.7558 7.87637 15.8084 6.96951C14.861 6.06265 13.325 6.06265 12.3776 6.96951L4.54387 14.4681C2.74382 16.1911 2.74382 18.9847 4.54387 20.7077C6.34391 22.4308 9.26237 22.4308 11.0624 20.7077L19.0105 13.0997C21.6632 10.5605 21.6632 6.44362 19.0105 3.90441C16.3578 1.3652 12.0569 1.3652 9.40419 3.90441L3 10.0346" stroke="#64748b" stroke-width="1.5" stroke-linecap="round"></path> </g></svg>
             </label>
             <button onclick="sendMessage()">Send</button>
         </footer>
