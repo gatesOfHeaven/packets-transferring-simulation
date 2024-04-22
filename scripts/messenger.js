@@ -20,6 +20,11 @@ const chat = {
     history: document.getElementById('history'),
     footer: document.querySelector('#manage-bar footer')
 };
+const messageInput = document.getElementById('message-input');
+messageInput.addEventListener('keydown', event => {
+    if (event.key == 'Enter')
+        sendMessage();
+});
 
 senderInput.setAttribute('max', graph.length - 1);
 receiverInput.setAttribute('max', graph.length - 1);
@@ -98,6 +103,7 @@ const openChat = () => {
             messageContentBody = document.createElement('img');
             messageContentBody.className = 'message-img';
             messageContentBody.src = message.image;
+            messageContentBody.addEventListener('click', openImage(message.image));
         } else {
             messageContentBody = document.createElement('div');
             messageContentBody.className = 'dialog-shape';
@@ -126,6 +132,10 @@ const openChat = () => {
         chat.history.appendChild(messageBody);
     });
 
+    document.addEventListener('keydown', shortcuts.escape);
+    document.addEventListener('keydown', shortcuts.focus);
+    document.addEventListener('keydown', shortcuts.upload);
+
     chat.history.scrollTop = chat.history.scrollHeight - chat.history.clientHeight;
     
     chat.history.addEventListener('contextmenu', showContext);
@@ -140,6 +150,10 @@ const closeChat = () => {
     }));
     edges.forEach(edge => edge.body.style.backgroundColor = '#ccc');
 
+    document.removeEventListener('keydown', shortcuts.escape);
+    document.removeEventListener('keydown', shortcuts.focus);
+    document.removeEventListener('keydown', shortcuts.upload);
+
     for (let part in chat)
         chat[part].style.display = 'none';
     phoneMenu.style.display = 'flex';
@@ -150,7 +164,6 @@ const closeChat = () => {
 };
 
 const sendMessage = () => {
-    const messageInput = document.getElementById("message-input");
     if (messageInput.value === "") {
         showAlert("💨", "Error!", "Your message is empty");
         return;
@@ -247,6 +260,7 @@ const sendMessageWithImage = (imageDataURL) => {
     const messageImage = document.createElement("img");
     messageImage.classList.add('message-img')
     messageImage.src = imageDataURL;
+    messageImage.addEventListener('click', openImage(imageDataURL));
 
     const messageBody = document.createElement("div");
     messageBody.className = "sender-message";
@@ -259,7 +273,24 @@ const sendMessageWithImage = (imageDataURL) => {
 };
 
 
+const openImage = imageDataURL => event => {
+    const modal = document.createElement('div');
+    modal.classList.add('modal');
+    
+    const modalImage = document.createElement('img');
+    modalImage.src = imageDataURL;
+    modalImage.classList.add('modal-image');
+    modal.appendChild(modalImage);
+    document.body.appendChild(modal);
 
+    const stopModal = () => {
+        modal.remove();
+        document.removeEventListener('keydown', stopModal);
+    };
+    modal.addEventListener('click', stopModal);
+    document.addEventListener('keydown', stopModal);
+    event.stopPropagation();
+};
 
 const showContext = (event) => {
     event.preventDefault();

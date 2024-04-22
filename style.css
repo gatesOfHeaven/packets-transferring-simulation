@@ -208,7 +208,7 @@ button {
             background-color: white;
             font-family: IBM Plex Mono, monospace;
         }
-        
+
         button {
             padding: 5px;
             border: none;
@@ -449,6 +449,29 @@ button {
     .option:hover {
         color: black;
     }
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.modal-image {
+    max-width: 90%;
+    max-height: 90%;
+    cursor: pointer;
+}
+
+body.modal-open {
+    overflow: hidden;
 }
 
 

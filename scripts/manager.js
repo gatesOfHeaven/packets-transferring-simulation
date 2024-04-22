@@ -117,3 +117,22 @@ const showAlert = (icon, header, message) => {
         setTimeout(() => alertBody.remove(), 250);
     }, 2500);
 };
+
+const shortcuts = {
+    escape: event => {
+        if (event.key == 'Escape')
+            closeChat();
+    },
+
+    focus: event => {
+        if (event.key == '/')
+            messageInput.focus();
+    },
+
+    upload: event => {
+        if ((event.ctrlKey || event.metaKey) && (event.key == 'f' || event.keyCode == 85)) {
+            event.preventDefault();
+            fileInput.click();
+        }
+    }
+};
