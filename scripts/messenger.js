@@ -8,6 +8,7 @@ let messages = [
         time: Date
     }
 ];
+messages = [];
 let currPath = [];
 
 const phoneMenu = document.querySelector('#manage-bar aside');
@@ -94,42 +95,55 @@ const openChat = () => {
     chat.header.querySelector('.avatar').textContent = receiverId;
     chat.footer.querySelector('.avatar').textContent = senderId;
     
-    messages.filter(message =>
-        senderId == message.senderId && receiverId == message.receiverId ||
-        senderId == message.receiverId && receiverId == message.senderId
-    ).forEach(message => {
-        let messageContentBody;
-        if (message.image) {
-            messageContentBody = document.createElement('img');
-            messageContentBody.className = 'message-img';
-            messageContentBody.src = message.image;
-            messageContentBody.addEventListener('click', openImage(message.image));
-        } else {
-            messageContentBody = document.createElement('div');
-            messageContentBody.className = 'dialog-shape';
-            messageContentBody.textContent = message.text;
-        }
+    messages.forEach(message => {
+        if (
+            senderId == message.senderId && receiverId == message.receiverId ||
+            senderId == message.receiverId && receiverId == message.senderId
+        ) {
+            let messageContentBody;
+            if (message.image) {
+                messageContentBody = document.createElement('img');
+                messageContentBody.className = 'message-img';
+                messageContentBody.src = message.image;
+                messageContentBody.addEventListener('click', openImage(message.image));
+            } else {
+                messageContentBody = document.createElement('div');
+                messageContentBody.className = 'dialog-shape';
+                messageContentBody.textContent = message.text;
+            }
 
-        let month = message.time.getMonth();
-        let hours = message.time.getHours();
-        let minutes = message.time.getMinutes();
-        month = (month < 9 ? '0' : '') + (month + 1);
-        hours = (hours < 10 ? '0' : '') + hours;
-        minutes = (minutes < 10 ? '0' : '') + minutes;
+            let month = message.time.getMonth();
+            let hours = message.time.getHours();
+            let minutes = message.time.getMinutes();
+            month = (month < 9 ? '0' : '') + (month + 1);
+            hours = (hours < 10 ? '0' : '') + hours;
+            minutes = (minutes < 10 ? '0' : '') + minutes;
 
-        const messageTimeBody = document.createElement('span');
-        messageTimeBody.className = 'time';
-        messageTimeBody.textContent = `${message.time.getDate()}.${month} ${hours}:${minutes}`;
-        
-        const messageBody = document.createElement('div');
-        if (senderId == message.senderId) {
-            messageBody.append(messageTimeBody, messageContentBody);
-            messageBody.className = 'sender-message';
-        } else {
-            messageBody.append(messageContentBody, messageTimeBody);
-            messageBody.className = 'receiver-message';
+            const messageTimeBody = document.createElement('span');
+            messageTimeBody.className = 'time';
+            messageTimeBody.textContent = `${message.time.getDate()}.${month} ${hours}:${minutes}`;
+            
+            const messageBody = document.createElement('div');
+            if (senderId == message.senderId) {
+                messageBody.append(messageTimeBody, messageContentBody);
+                messageBody.className = 'sender-message';
+            } else {
+                messageBody.append(messageContentBody, messageTimeBody);
+                messageBody.className = 'receiver-message';
+            }
+            chat.history.appendChild(messageBody);
+        } else if (message.path.includes(senderId) && senderId != message.senderId) {
+            const messageContentBody = document.createElement('div');
+            messageContentBody.className = 'transferring-message';
+            messageContentBody.textContent = `${message.senderId} sent message to ${message.receiverId}`;
+            messageContentBody.addEventListener('click', () => {
+                closeChat();
+                senderInput.value = message.senderId;
+                receiverInput.value = message.receiverId;
+                openChat();
+            });
+            chat.history.appendChild(messageContentBody);
         }
-        chat.history.appendChild(messageBody);
     });
 
     document.addEventListener('keydown', shortcuts.escape);
@@ -291,6 +305,14 @@ const openImage = imageDataURL => event => {
     document.addEventListener('keydown', stopModal);
     event.stopPropagation();
 };
+
+
+const swap = () => {
+    const temp = senderInput.value;
+    senderInput.value = receiverInput.value;
+    receiverInput.value = temp;
+};
+
 
 const showContext = (event) => {
     event.preventDefault();
